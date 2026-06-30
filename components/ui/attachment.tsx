@@ -1,8 +1,8 @@
-import { cva, type VariantProps } from "class-variance-authority"
-import { Slot } from "radix-ui"
-import type * as React from "react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
+import type * as React from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const attachmentVariants = cva(
   "group/attachment relative flex w-fit max-w-full min-w-0 shrink-0 flex-wrap rounded-xl border bg-card text-card-foreground transition-colors focus-within:ring-1 focus-within:ring-ring/50 has-[>a,>button]:hover:bg-muted/50 data-[state=error]:border-destructive/30 data-[state=idle]:border-dashed",
@@ -20,7 +20,7 @@ const attachmentVariants = cva(
       },
     },
   }
-)
+);
 
 function Attachment({
   className,
@@ -30,7 +30,7 @@ function Attachment({
   ...props
 }: React.ComponentProps<"div"> &
   VariantProps<typeof attachmentVariants> & {
-    state?: "idle" | "uploading" | "processing" | "error" | "done"
+    state?: "idle" | "uploading" | "processing" | "error" | "done";
   }) {
   return (
     <div
@@ -41,7 +41,7 @@ function Attachment({
       className={cn(attachmentVariants({ size, orientation }), className)}
       {...props}
     />
-  )
+  );
 }
 
 const attachmentMediaVariants = cva(
@@ -58,7 +58,7 @@ const attachmentMediaVariants = cva(
       variant: "icon",
     },
   }
-)
+);
 
 function AttachmentMedia({
   className,
@@ -72,7 +72,7 @@ function AttachmentMedia({
       className={cn(attachmentMediaVariants({ variant }), className)}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentContent({
@@ -88,7 +88,7 @@ function AttachmentContent({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentTitle({
@@ -104,7 +104,7 @@ function AttachmentTitle({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentDescription({
@@ -121,7 +121,7 @@ function AttachmentDescription({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentActions({
@@ -137,7 +137,7 @@ function AttachmentActions({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentAction({
@@ -154,7 +154,7 @@ function AttachmentAction({
       className={cn(className)}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentTrigger({
@@ -163,9 +163,9 @@ function AttachmentTrigger({
   type,
   ...props
 }: React.ComponentProps<"button"> & {
-  asChild?: boolean
+  asChild?: boolean;
 }) {
-  const Comp = asChild ? Slot.Root : "button"
+  const Comp = asChild ? Slot.Root : "button";
 
   return (
     <Comp
@@ -174,7 +174,7 @@ function AttachmentTrigger({
       className={cn("absolute inset-0 z-10 outline-none", className)}
       {...props}
     />
-  )
+  );
 }
 
 function AttachmentGroup({ className, ...props }: React.ComponentProps<"div">) {
@@ -187,7 +187,7 @@ function AttachmentGroup({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -200,4 +200,4 @@ export {
   AttachmentMedia,
   AttachmentTitle,
   AttachmentTrigger,
-}
+};

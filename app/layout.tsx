@@ -1,25 +1,25 @@
-import { Figtree, Geist, Geist_Mono, Roboto_Slab } from "next/font/google"
+import { Figtree, Geist, Geist_Mono, Roboto_Slab } from "next/font/google";
 
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils"
+import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
 const robotoSlabHeading = Roboto_Slab({
   subsets: ["latin"],
   variable: "--font-heading",
-})
+});
 
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" })
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-})
+});
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
@@ -37,5 +37,5 @@ export default function RootLayout({
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

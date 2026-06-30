@@ -1,7 +1,8 @@
-import { Figtree, Geist, Geist_Mono, Roboto_Slab } from "next/font/google";
+import { Figtree, Geist_Mono, Roboto_Slab } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const robotoSlabHeading = Roboto_Slab({
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fr"
       suppressHydrationWarning
       className={cn(
         "antialiased",
@@ -35,6 +36,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

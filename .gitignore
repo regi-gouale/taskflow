@@ -36,5 +36,5 @@ pnpm-debug.log*
 next-env.d.ts
 
 /lib/generated/prisma
-
 /generated/prisma
+.playwright-mcp/

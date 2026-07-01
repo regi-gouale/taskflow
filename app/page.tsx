@@ -1,7 +1,18 @@
 import { IconRocket } from "@tabler/icons-react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
   return (
     <div className="flex min-h-svh p-6">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">

@@ -1,5 +1,6 @@
 "use client";
 
+import { IconArrowLeft, IconLock, IconLockCheck } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -18,7 +19,11 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
@@ -75,8 +80,9 @@ function ResetPasswordForm() {
         <CardContent className="text-center text-sm text-muted-foreground">
           <Link
             href="/forgot-password"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-1.5 font-medium text-foreground underline-offset-4 hover:underline"
           >
+            <IconArrowLeft className="size-4" />
             Demander un nouveau lien
           </Link>
         </CardContent>
@@ -97,31 +103,41 @@ function ResetPasswordForm() {
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="password">Nouveau mot de passe</FieldLabel>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
+              <InputGroup>
+                <InputGroupAddon>
+                  <IconLock />
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                />
+              </InputGroup>
               <FieldDescription>Au moins 8 caractères.</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="confirmPassword">
                 Confirmer le mot de passe
               </FieldLabel>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
+              <InputGroup>
+                <InputGroupAddon>
+                  <IconLock />
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                />
+              </InputGroup>
             </Field>
             <Button type="submit" disabled={isLoading}>
-              {isLoading && <Spinner />}
+              {isLoading ? <Spinner /> : <IconLockCheck />}
               Réinitialiser le mot de passe
             </Button>
           </FieldGroup>

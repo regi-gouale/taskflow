@@ -1,5 +1,6 @@
 "use client";
 
+import { IconLock, IconLogin2, IconMail } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,7 +14,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "@/lib/auth-client";
 
@@ -58,15 +63,20 @@ export default function SignInPage() {
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="email">Adresse e-mail</FieldLabel>
-              <Input
-                id="email"
-                data-testid="email-input"
-                name="email"
-                type="email"
-                autoComplete="email"
-                placeholder="vous@exemple.com"
-                required
-              />
+              <InputGroup>
+                <InputGroupAddon>
+                  <IconMail />
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="email"
+                  data-testid="email-input"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="vous@exemple.com"
+                  required
+                />
+              </InputGroup>
             </Field>
             <Field>
               <div className="flex items-center justify-between">
@@ -78,17 +88,22 @@ export default function SignInPage() {
                   Mot de passe oublié&nbsp;?
                 </Link>
               </div>
-              <Input
-                id="password"
-                data-testid="password-input"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
+              <InputGroup>
+                <InputGroupAddon>
+                  <IconLock />
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="password"
+                  data-testid="password-input"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
+              </InputGroup>
             </Field>
             <Button type="submit" disabled={isLoading}>
-              {isLoading && <Spinner />}
+              {isLoading ? <Spinner /> : <IconLogin2 />}
               Se connecter
             </Button>
           </FieldGroup>

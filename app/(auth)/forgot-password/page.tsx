@@ -1,5 +1,6 @@
 "use client";
 
+import { IconArrowLeft, IconMail, IconSend } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +13,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
@@ -56,17 +61,22 @@ export default function ForgotPasswordPage() {
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Adresse e-mail</FieldLabel>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="vous@exemple.com"
-                  required
-                />
+                <InputGroup>
+                  <InputGroupAddon>
+                    <IconMail />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="vous@exemple.com"
+                    required
+                  />
+                </InputGroup>
               </Field>
               <Button type="submit" disabled={isLoading}>
-                {isLoading && <Spinner />}
+                {isLoading ? <Spinner /> : <IconSend />}
                 Envoyer le lien
               </Button>
             </FieldGroup>
@@ -76,8 +86,9 @@ export default function ForgotPasswordPage() {
       <CardContent className="text-center text-sm text-muted-foreground">
         <Link
           href="/sign-in"
-          className="font-medium text-foreground underline-offset-4 hover:underline"
+          className="inline-flex items-center gap-1.5 font-medium text-foreground underline-offset-4 hover:underline"
         >
+          <IconArrowLeft className="size-4" />
           Retour à la connexion
         </Link>
       </CardContent>

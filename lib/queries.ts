@@ -26,7 +26,21 @@ export async function requireUser(): Promise<SessionUser> {
 }
 
 export type TaskWithRelations = Prisma.TaskGetPayload<{
-  include: { project: true; assignee: true };
+  include: {
+    project: true;
+    assignee: true;
+    comments: {
+      include: {
+        author: {
+          select: {
+            id: true;
+            name: true;
+            email: true;
+          };
+        };
+      };
+    };
+  };
 }>;
 
 export type TaskFilters = {
@@ -49,7 +63,18 @@ export async function getTasks(userId: string, filters: TaskFilters = {}) {
         ? { contains: filters.search, mode: "insensitive" }
         : undefined,
     },
-    include: { project: true, assignee: true },
+    include: {
+      project: true,
+      assignee: true,
+      comments: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      },
+    },
     orderBy: [{ position: "asc" }, { createdAt: "desc" }],
   });
 }
@@ -124,7 +149,18 @@ export async function getDashboardData(userId: string) {
       prisma.task.count({ where: { userId, status: TaskStatus.DONE } }),
       prisma.task.findMany({
         where: { userId },
-        include: { project: true, assignee: true },
+        include: {
+          project: true,
+          assignee: true,
+          comments: {
+            orderBy: { createdAt: "asc" },
+            include: {
+              author: {
+                select: { id: true, name: true, email: true },
+              },
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
         take: 5,
       }),
@@ -234,7 +270,18 @@ export async function getReportStats(userId: string) {
 export async function getCalendarTasks(userId: string) {
   return prisma.task.findMany({
     where: { userId, dueDate: { not: null } },
-    include: { project: true, assignee: true },
+    include: {
+      project: true,
+      assignee: true,
+      comments: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      },
+    },
     orderBy: { dueDate: "asc" },
   });
 }

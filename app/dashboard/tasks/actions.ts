@@ -11,6 +11,7 @@ import { requireUser } from "@/lib/queries";
 import { revalidateTaskViews } from "@/lib/revalidate";
 import {
   taskBoardReorderSchema,
+  taskCommentCreateSchema,
   taskCreateSchema,
   taskToggleSchema,
   taskUpdateSchema,
@@ -204,6 +205,39 @@ export async function reorderBoard(input: unknown): Promise<ActionResult> {
     });
 
     await prisma.$transaction(updates);
+    revalidateTaskViews();
+    return { ok: true };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function addTaskComment(input: unknown): Promise<ActionResult> {
+  const user = await requireUser();
+  const parsed = taskCommentCreateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: firstZodError(parsed.error) };
+  }
+
+  try {
+    const { taskId, content } = parsed.data;
+    const task = await prisma.task.findFirst({
+      where: { id: taskId, userId: user.id },
+      select: { id: true },
+    });
+
+    if (!task) {
+      return { ok: false, error: "Tâche introuvable." };
+    }
+
+    await prisma.taskComment.create({
+      data: {
+        content,
+        taskId: task.id,
+        authorId: user.id,
+      },
+    });
+
     revalidateTaskViews();
     return { ok: true };
   } catch (error) {

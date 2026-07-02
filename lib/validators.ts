@@ -67,6 +67,15 @@ export const taskBoardReorderSchema = z.object({
   ),
 });
 
+export const taskCommentCreateSchema = z.object({
+  taskId: z.string().min(1, "Identifiant de tâche manquant."),
+  content: z
+    .string()
+    .trim()
+    .min(1, "Le commentaire est requis.")
+    .max(2000, "Le commentaire est trop long."),
+});
+
 export const projectCreateSchema = z.object({
   name: z
     .string()

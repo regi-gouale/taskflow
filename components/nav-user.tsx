@@ -7,6 +7,7 @@ import {
   IconSettings,
   IconUserCircle,
 } from "@tabler/icons-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -117,17 +118,23 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Mon compte
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings" data-testid="nav-account">
+                  <IconUserCircle />
+                  Mon compte
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => toast.info("Bientôt disponible.")}
+              >
                 <IconBell />
                 Notifications
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconSettings />
-                Paramètres
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">
+                  <IconSettings />
+                  Paramètres
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

@@ -4,7 +4,6 @@ import { IconFolderPlus } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createProject, updateProject } from "@/app/dashboard/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,6 +26,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import type { ProjectStatus } from "@/generated/prisma/client";
+import { apiRequest } from "@/lib/api-client";
 import { PROJECT_STATUS_META } from "@/lib/task-format";
 import { cn } from "@/lib/utils";
 
@@ -135,8 +135,14 @@ export function ProjectDialog({
 
     startTransition(async () => {
       const result = project
-        ? await updateProject({ id: project.id, ...payload })
-        : await createProject(payload);
+        ? await apiRequest(`/api/v1/projects/${project.id}`, {
+            method: "PATCH",
+            body: payload,
+          })
+        : await apiRequest("/api/v1/projects", {
+            method: "POST",
+            body: payload,
+          });
 
       if (!result.ok) {
         toast.error(result.error);

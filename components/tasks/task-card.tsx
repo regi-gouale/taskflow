@@ -12,11 +12,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import {
-  addTaskComment,
-  deleteTask,
-  toggleTaskDone,
-} from "@/app/dashboard/tasks/actions";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import type { MemberOption, ProjectOption } from "@/components/tasks/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -39,13 +34,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
+import { apiRequest } from "@/lib/api-client";
 import type { TaskWithRelations } from "@/lib/queries";
 import {
   formatDueDate,
   initials,
   isOverdue,
-  TASK_STATUS_META,
   TASK_PRIORITY_META,
+  TASK_STATUS_META,
 } from "@/lib/task-format";
 import { cn } from "@/lib/utils";
 
@@ -105,9 +101,12 @@ export function TaskCard({
     }
 
     startCommentTransition(async () => {
-      const result = await addTaskComment({
-        taskId: task.id,
-        content: comment,
+      const result = await apiRequest("/api/v1/tasks/comments", {
+        method: "POST",
+        body: {
+          taskId: task.id,
+          content: comment,
+        },
       });
 
       if (!result.ok) {
@@ -123,7 +122,10 @@ export function TaskCard({
 
   function handleToggle(next: boolean) {
     startTransition(async () => {
-      const result = await toggleTaskDone({ id: task.id, done: next });
+      const result = await apiRequest("/api/v1/tasks/toggle", {
+        method: "POST",
+        body: { id: task.id, done: next },
+      });
       if (!result.ok) {
         toast.error(result.error);
         return;
@@ -141,7 +143,9 @@ export function TaskCard({
       return;
     }
     startTransition(async () => {
-      const result = await deleteTask(task.id);
+      const result = await apiRequest(`/api/v1/tasks/${task.id}`, {
+        method: "DELETE",
+      });
       if (!result.ok) {
         toast.error(result.error);
         return;

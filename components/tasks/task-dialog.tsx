@@ -6,7 +6,6 @@ import { fr } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createTask, updateTask } from "@/app/dashboard/tasks/actions";
 import type { MemberOption, ProjectOption } from "@/components/tasks/types";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -36,6 +35,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import type { TaskPriority, TaskStatus } from "@/generated/prisma/client";
+import { apiRequest } from "@/lib/api-client";
 import type { TaskWithRelations } from "@/lib/queries";
 import {
   TASK_PRIORITY_META,
@@ -165,8 +165,14 @@ export function TaskDialog({
     startTransition(async () => {
       const result =
         task != null
-          ? await updateTask({ id: task.id, ...payload })
-          : await createTask(payload);
+          ? await apiRequest(`/api/v1/tasks/${task.id}`, {
+              method: "PATCH",
+              body: payload,
+            })
+          : await apiRequest("/api/v1/tasks", {
+              method: "POST",
+              body: payload,
+            });
 
       if (!result.ok) {
         toast.error(result.error);

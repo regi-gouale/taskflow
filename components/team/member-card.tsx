@@ -10,7 +10,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteMember } from "@/app/dashboard/team/actions";
 import { MemberDialog } from "@/components/team/member-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { apiRequest } from "@/lib/api-client";
 import type { MemberWithCount } from "@/lib/queries";
 import { initials } from "@/lib/task-format";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,9 @@ export function MemberCard({ member }: { member: MemberWithCount }) {
       return;
     }
     startTransition(async () => {
-      const result = await deleteMember(member.id);
+      const result = await apiRequest(`/api/v1/members/${member.id}`, {
+        method: "DELETE",
+      });
       if (!result.ok) {
         toast.error(result.error);
         return;

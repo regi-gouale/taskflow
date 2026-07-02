@@ -10,7 +10,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteProject } from "@/app/dashboard/projects/actions";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
+import { apiRequest } from "@/lib/api-client";
 import type { ProjectWithProgress } from "@/lib/queries";
 import { PROJECT_STATUS_META } from "@/lib/task-format";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,9 @@ export function ProjectCard({ project }: { project: ProjectWithProgress }) {
       return;
     }
     startTransition(async () => {
-      const result = await deleteProject(project.id);
+      const result = await apiRequest(`/api/v1/projects/${project.id}`, {
+        method: "DELETE",
+      });
       if (!result.ok) {
         toast.error(result.error);
         return;

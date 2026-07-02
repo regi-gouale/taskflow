@@ -5,8 +5,8 @@ import type { DragEndEvent, DragOverEvent } from "@dnd-kit/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { reorderBoard } from "@/app/dashboard/tasks/actions";
 import type { TaskStatus } from "@/generated/prisma/client";
+import { apiRequest } from "@/lib/api-client";
 import type { TaskWithRelations } from "@/lib/queries";
 import { TASK_STATUS_ORDER } from "@/lib/task-format";
 
@@ -69,7 +69,10 @@ export function useTaskBoard(tasks: TaskWithRelations[]) {
     };
 
     startTransition(async () => {
-      const result = await reorderBoard(payload);
+      const result = await apiRequest("/api/v1/tasks/reorder", {
+        method: "POST",
+        body: payload,
+      });
       if (!result.ok) {
         toast.error(result.error);
         const reset = groupByStatus(tasks);

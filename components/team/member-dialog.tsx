@@ -4,7 +4,6 @@ import { IconUserPlus } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createMember, updateMember } from "@/app/dashboard/team/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,6 +17,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { apiRequest } from "@/lib/api-client";
 
 type MemberInput = {
   id: string;
@@ -102,8 +102,14 @@ export function MemberDialog({
 
     startTransition(async () => {
       const result = member
-        ? await updateMember({ id: member.id, ...payload })
-        : await createMember(payload);
+        ? await apiRequest(`/api/v1/members/${member.id}`, {
+            method: "PATCH",
+            body: payload,
+          })
+        : await apiRequest("/api/v1/members", {
+            method: "POST",
+            body: payload,
+          });
 
       if (!result.ok) {
         toast.error(result.error);

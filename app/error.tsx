@@ -40,7 +40,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           </CardTitle>
           <CardDescription className="mx-auto max-w-md text-balance">
             Nous n&apos;avons pas pu charger cette page correctement. Vous
-            pouvez reessayer immediatement ou revenir au tableau de bord.
+            pouvez réessayer immédiatement ou revenir au tableau de bord.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -58,7 +58,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         <CardFooter className="flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button onClick={reset} className="w-full sm:w-auto">
             <IconRefresh />
-            Reessayer
+            Réessayer
           </Button>
           <Button asChild variant="outline" className="w-full sm:w-auto">
             <Link href="/dashboard">

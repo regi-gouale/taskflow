@@ -46,7 +46,7 @@ export default function NotFound() {
           <Button asChild variant="outline" className="w-full sm:w-auto">
             <Link href="/">
               <IconArrowLeft />
-              Revenir a l&apos;accueil
+              Revenir à l&apos;accueil
             </Link>
           </Button>
         </CardFooter>

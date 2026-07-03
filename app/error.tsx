@@ -1,6 +1,6 @@
 "use client";
 
-import { IconRefresh, IconAlertTriangle, IconHome2 } from "@tabler/icons-react";
+import { IconAlertTriangle, IconHome2, IconRefresh } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect } from "react";
 

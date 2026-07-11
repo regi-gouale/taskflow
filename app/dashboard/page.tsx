@@ -1,8 +1,10 @@
 import {
   IconAlertTriangle,
+  IconArrowRight,
   IconChecks,
   IconClock,
   IconListCheck,
+  IconPlus,
   IconTrendingUp,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -93,9 +95,16 @@ export default async function DashboardPage() {
     icon: ComponentType<{ className?: string }>;
   }[];
 
+  const priorityMessage =
+    data.stats.overdue > 0
+      ? `${data.stats.overdue} tâche${data.stats.overdue > 1 ? "s" : ""} en retard nécessitent une action.`
+      : data.stats.active > 0
+        ? `${data.stats.active} tâche${data.stats.active > 1 ? "s" : ""} active${data.stats.active > 1 ? "s" : ""} à suivre aujourd'hui.`
+        : "Aucune urgence en cours. Vous pouvez planifier les prochaines priorités.";
+
   return (
     <>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3">
         <div>
           <h1 className="font-heading text-2xl font-semibold tracking-tight">
             Tableau de bord
@@ -104,15 +113,70 @@ export default async function DashboardPage() {
             Voici l&apos;état de vos projets et tâches aujourd&apos;hui.
           </p>
         </div>
-        <TaskDialog projects={projectOptions} members={memberOptions} />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/dashboard/tasks">
+              <IconListCheck />
+              Ouvrir mes tâches
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/dashboard/projects">Ouvrir les projets</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/dashboard/reports">
+              Voir les rapports
+              <IconArrowRight />
+            </Link>
+          </Button>
+        </div>
       </div>
+
+      <Card className="border-primary/20 bg-primary/[0.04]">
+        <CardHeader>
+          <CardTitle className="text-lg">À traiter maintenant</CardTitle>
+          <CardDescription>{priorityMessage}</CardDescription>
+          <CardAction>
+            <TaskDialog
+              projects={projectOptions}
+              members={memberOptions}
+              trigger={
+                <Button size="sm" data-testid="dashboard-priority-new-task">
+                  <IconPlus />
+                  Nouvelle tâche
+                </Button>
+              }
+            />
+          </CardAction>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="gap-1.5">
+            <span className="text-muted-foreground">En retard :</span>
+            <span className="font-semibold tabular-nums">
+              {data.stats.overdue}
+            </span>
+          </Badge>
+          <Badge variant="outline" className="gap-1.5">
+            <span className="text-muted-foreground">Actives :</span>
+            <span className="font-semibold tabular-nums">
+              {data.stats.active}
+            </span>
+          </Badge>
+          <Badge variant="outline" className="gap-1.5">
+            <span className="text-muted-foreground">Terminées (7 j) :</span>
+            <span className="font-semibold tabular-nums">
+              {data.stats.completedWeek}
+            </span>
+          </Badge>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardHeader>
               <CardDescription>{stat.label}</CardDescription>
-              <CardTitle className="font-heading text-3xl tabular-nums">
+              <CardTitle className="text-2xl tabular-nums">
                 {stat.value}
               </CardTitle>
               <CardAction>
@@ -143,9 +207,27 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="px-0">
             {data.recentTasks.length === 0 ? (
-              <p className="px-6 py-8 text-center text-sm text-muted-foreground">
-                Aucune tâche pour le moment.
-              </p>
+              <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
+                <p className="max-w-[45ch] text-sm text-muted-foreground">
+                  Aucune tâche pour le moment. Commencez par créer une première
+                  tâche, puis attribuez-la pour lancer le suivi.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <TaskDialog
+                    projects={projectOptions}
+                    members={memberOptions}
+                    trigger={
+                      <Button size="sm" data-testid="dashboard-empty-new-task">
+                        <IconPlus />
+                        Créer une tâche
+                      </Button>
+                    }
+                  />
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/dashboard/tasks">Ouvrir la vue tâches</Link>
+                  </Button>
+                </div>
+              </div>
             ) : (
               <Table>
                 <TableHeader>
@@ -216,7 +298,14 @@ export default async function DashboardPage() {
                               "font-medium text-red-600 dark:text-red-400"
                           )}
                         >
-                          {formatDueDate(task.dueDate)}
+                          {overdue ? (
+                            <span className="inline-flex items-center gap-1.5">
+                              <Badge variant="destructive">En retard</Badge>
+                              <span>{formatDueDate(task.dueDate)}</span>
+                            </span>
+                          ) : (
+                            formatDueDate(task.dueDate)
+                          )}
                         </TableCell>
                       </TableRow>
                     );
@@ -234,9 +323,15 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
             {data.projects.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Aucun projet pour le moment.
-              </p>
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-muted-foreground">
+                  Aucun projet pour le moment. Créez des tâches d&apos;abord ou
+                  ouvrez la section projets pour structurer votre plan.
+                </p>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard/projects">Configurer les projets</Link>
+                </Button>
+              </div>
             ) : (
               data.projects.map((project) => (
                 <div key={project.id} className="flex flex-col gap-2">
@@ -246,7 +341,10 @@ export default async function DashboardPage() {
                       {project.progress}%
                     </span>
                   </div>
-                  <Progress value={project.progress} />
+                  <Progress
+                    value={project.progress}
+                    aria-label={`Progression du projet ${project.name}`}
+                  />
                   <p className="text-xs text-muted-foreground">
                     {project.doneCount} / {project.taskCount} tâches terminées
                   </p>

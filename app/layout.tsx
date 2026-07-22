@@ -81,9 +81,14 @@ export default function RootLayout({
       <head>
         <script
           defer
-          src="https://analytics.gouale.com/recorder.js"
+          src="https://analytics.gouale.com/script.js"
           data-website-id="ace17e0a-dd31-4b8e-b2b2-67c9df5e79e1"
           data-domains="taskflow.gouale.com"
+        />
+        <script
+          defer
+          src="https://analytics.gouale.com/recorder.js"
+          data-website-id="ace17e0a-dd31-4b8e-b2b2-67c9df5e79e1"
         />
       </head>
       <body>

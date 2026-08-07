@@ -58,11 +58,7 @@
     "@types/pg": "^8.20.4",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "eslint": "^9.39.5",
-    "eslint-config-next": "16.2.6",
     "husky": "^9.1.7",
-    "prettier": "^3.9.6",
-    "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "^7.9.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"

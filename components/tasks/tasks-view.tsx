@@ -2,7 +2,7 @@
 
 import { IconLayoutKanban, IconList, IconSearch } from "@tabler/icons-react";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { TaskBoard, TaskList } from "@/components/tasks/task-dnd";
 import type { MemberOption, ProjectOption } from "@/components/tasks/types";
@@ -25,11 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { apiRequest, TASKS_UPDATED_EVENT } from "@/lib/api-client";
 import type { TaskWithRelations } from "@/lib/queries";
-import {
-  apiRequest,
-  TASKS_UPDATED_EVENT,
-} from "@/lib/api-client";
 import { TASK_PRIORITY_META, TASK_PRIORITY_ORDER } from "@/lib/task-format";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +41,6 @@ export function TasksView({ projects, members }: TasksViewProps) {
   const [tasks, setTasks] = useState<TaskWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
   const [view, setView] = useQueryState(
     "view",
     parseAsStringLiteral(["board", "list"] as const).withDefault("board")
@@ -63,36 +59,30 @@ export function TasksView({ projects, members }: TasksViewProps) {
     parseAsString.withDefault(ALL)
   );
 
-  useEffect(() => {
-    let isCurrent = true;
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    const result = await apiRequest<TaskWithRelations[]>("/api/v1/tasks");
 
-    async function loadTasks() {
-      setIsLoading(true);
-      setLoadError(null);
-      const result = await apiRequest<TaskWithRelations[]>("/api/v1/tasks");
-
-      if (!isCurrent) {
-        return;
-      }
-      if (result.ok) {
-        setTasks(result.data);
-      } else {
-        setLoadError(result.error);
-      }
-      setIsLoading(false);
+    if (result.ok) {
+      setTasks(result.data);
+    } else {
+      setLoadError(result.error);
     }
+    setIsLoading(false);
+  }, []);
 
+  useEffect(() => {
     function handleTasksUpdated() {
-      setReloadKey((current) => current + 1);
+      void loadTasks();
     }
 
     void loadTasks();
     window.addEventListener(TASKS_UPDATED_EVENT, handleTasksUpdated);
     return () => {
-      isCurrent = false;
       window.removeEventListener(TASKS_UPDATED_EVENT, handleTasksUpdated);
     };
-  }, [reloadKey]);
+  }, [loadTasks]);
 
   const query = search.trim().toLowerCase();
   const filtering =
@@ -233,7 +223,7 @@ export function TasksView({ projects, members }: TasksViewProps) {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => setReloadKey((current) => current + 1)}
+            onClick={() => void loadTasks()}
           >
             Réessayer
           </Button>

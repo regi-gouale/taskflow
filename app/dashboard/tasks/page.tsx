@@ -1,5 +1,9 @@
 import { TasksView } from "@/components/tasks/tasks-view";
-import { getMembers, getProjectsWithProgress, requireUser } from "@/lib/queries";
+import {
+  getMembers,
+  getProjectsWithProgress,
+  requireUser,
+} from "@/lib/queries";
 
 export default async function TasksPage() {
   const user = await requireUser();

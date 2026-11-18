@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
+import { openAPI } from "better-auth/plugins"
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -15,5 +16,5 @@ export const auth = betterAuth({
       await sendPasswordResetEmail({ to: user.email, url });
     },
   },
-  plugins: [nextCookies()],
+  plugins: [openAPI(), nextCookies()],
 });

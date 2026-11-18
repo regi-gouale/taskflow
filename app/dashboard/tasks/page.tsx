@@ -1,15 +1,9 @@
 import { TasksView } from "@/components/tasks/tasks-view";
-import {
-  getMembers,
-  getProjectsWithProgress,
-  getTasks,
-  requireUser,
-} from "@/lib/queries";
+import { getMembers, getProjectsWithProgress, requireUser } from "@/lib/queries";
 
 export default async function TasksPage() {
   const user = await requireUser();
-  const [tasks, projects, members] = await Promise.all([
-    getTasks(user.id),
+  const [projects, members] = await Promise.all([
     getProjectsWithProgress(user.id),
     getMembers(user.id),
   ]);
@@ -35,11 +29,7 @@ export default async function TasksPage() {
         </p>
       </div>
 
-      <TasksView
-        tasks={tasks}
-        projects={projectOptions}
-        members={memberOptions}
-      />
+      <TasksView projects={projectOptions} members={memberOptions} />
     </>
   );
 }

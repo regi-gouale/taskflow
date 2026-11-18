@@ -2,6 +2,7 @@
 
 import { IconLayoutKanban, IconList, IconSearch } from "@tabler/icons-react";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
+import { useCallback, useEffect, useState } from "react";
 import { TaskDialog } from "@/components/tasks/task-dialog";
 import { TaskBoard, TaskList } from "@/components/tasks/task-dnd";
 import type { MemberOption, ProjectOption } from "@/components/tasks/types";
@@ -24,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { apiRequest, TASKS_UPDATED_EVENT } from "@/lib/api-client";
 import type { TaskWithRelations } from "@/lib/queries";
 import { TASK_PRIORITY_META, TASK_PRIORITY_ORDER } from "@/lib/task-format";
 import { cn } from "@/lib/utils";
@@ -31,12 +33,14 @@ import { cn } from "@/lib/utils";
 const ALL = "all";
 
 type TasksViewProps = {
-  tasks: TaskWithRelations[];
   projects: ProjectOption[];
   members: MemberOption[];
 };
 
-export function TasksView({ tasks, projects, members }: TasksViewProps) {
+export function TasksView({ projects, members }: TasksViewProps) {
+  const [tasks, setTasks] = useState<TaskWithRelations[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [view, setView] = useQueryState(
     "view",
     parseAsStringLiteral(["board", "list"] as const).withDefault("board")
@@ -54,6 +58,31 @@ export function TasksView({ tasks, projects, members }: TasksViewProps) {
     "assignee",
     parseAsString.withDefault(ALL)
   );
+
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    const result = await apiRequest<TaskWithRelations[]>("/api/v1/tasks");
+
+    if (result.ok) {
+      setTasks(result.data);
+    } else {
+      setLoadError(result.error);
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    function handleTasksUpdated() {
+      void loadTasks();
+    }
+
+    void loadTasks();
+    window.addEventListener(TASKS_UPDATED_EVENT, handleTasksUpdated);
+    return () => {
+      window.removeEventListener(TASKS_UPDATED_EVENT, handleTasksUpdated);
+    };
+  }, [loadTasks]);
 
   const query = search.trim().toLowerCase();
   const filtering =
@@ -183,42 +212,62 @@ export function TasksView({ tasks, projects, members }: TasksViewProps) {
         <TaskDialog projects={projects} members={members} />
       </div>
 
-      {filtering ? (
-        <p
-          className={cn(
-            "rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground"
-          )}
-          data-testid="filter-note"
-        >
-          Réorganisation par glisser-déposer en pause pendant le filtrage.
+      {isLoading ? (
+        <p role="status" className="text-sm text-muted-foreground">
+          Chargement des tâches…
         </p>
-      ) : null}
-
-      {visible.length === 0 ? (
-        <Empty className="border">
-          <EmptyHeader>
-            <EmptyTitle>Aucune tâche</EmptyTitle>
-            <EmptyDescription>
-              {filtering
-                ? "Aucune tâche ne correspond à vos filtres."
-                : "Créez votre première tâche pour commencer."}
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : view === "board" ? (
-        <TaskBoard
-          tasks={visible}
-          projects={projects}
-          members={members}
-          readOnly={filtering}
-        />
+      ) : loadError ? (
+        <div role="alert" className="flex items-center gap-3 text-sm">
+          <p className="text-destructive">{loadError}</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void loadTasks()}
+          >
+            Réessayer
+          </Button>
+        </div>
       ) : (
-        <TaskList
-          tasks={visible}
-          projects={projects}
-          members={members}
-          readOnly={filtering}
-        />
+        <>
+          {filtering ? (
+            <p
+              className={cn(
+                "rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground"
+              )}
+              data-testid="filter-note"
+            >
+              Réorganisation par glisser-déposer en pause pendant le filtrage.
+            </p>
+          ) : null}
+
+          {visible.length === 0 ? (
+            <Empty className="border">
+              <EmptyHeader>
+                <EmptyTitle>Aucune tâche</EmptyTitle>
+                <EmptyDescription>
+                  {filtering
+                    ? "Aucune tâche ne correspond à vos filtres."
+                    : "Créez votre première tâche pour commencer."}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : view === "board" ? (
+            <TaskBoard
+              tasks={visible}
+              projects={projects}
+              members={members}
+              readOnly={filtering}
+            />
+          ) : (
+            <TaskList
+              tasks={visible}
+              projects={projects}
+              members={members}
+              readOnly={filtering}
+            />
+          )}
+        </>
       )}
     </div>
   );

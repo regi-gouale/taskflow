@@ -2,6 +2,8 @@ export type ApiClientResult<T = unknown> =
   | { ok: true; data: T }
   | { ok: false; error: string };
 
+export const TASKS_UPDATED_EVENT = "taskflow:tasks-updated";
+
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
@@ -12,8 +14,9 @@ export async function apiRequest<T = unknown>(
   options: RequestOptions = {}
 ): Promise<ApiClientResult<T>> {
   try {
+    const method = options.method ?? "GET";
     const response = await fetch(path, {
-      method: options.method ?? "GET",
+      method,
       headers:
         options.body === undefined
           ? undefined
@@ -40,6 +43,14 @@ export async function apiRequest<T = unknown>(
         ok: false,
         error: payload?.error ?? "Reponse API invalide.",
       };
+    }
+
+    if (
+      typeof window !== "undefined" &&
+      method !== "GET" &&
+      (path === "/api/v1/tasks" || path.startsWith("/api/v1/tasks/"))
+    ) {
+      window.dispatchEvent(new Event(TASKS_UPDATED_EVENT));
     }
 
     return {
